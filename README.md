@@ -2,7 +2,8 @@
 
 Student: anasaemd
 Platform: CSC cPouta and OpenTofu
-GitHub Repository: https://github.com/anasaemd25/cloud_services_assignment_7
+GitHub Repository: https://github.com/anasaemd25/cloud-services-assignment-7
+Website: https://frontend-cloud-services-assignment-2.2.rahtiapp.fi/assignment7.html
 
 ## Part A: Theoretical Questions
 
