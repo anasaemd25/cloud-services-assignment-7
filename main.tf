@@ -12,7 +12,7 @@ resource "openstack_compute_keypair_v2" "web" {
 # Firewall (security group) with only the rules we need
 resource "openstack_networking_secgroup_v2" "web" {
   name        = "${var.name_prefix}-web-sg"
-  description = "SSH from my IP, HTTP from anywhere. Managed by OpenTofu."
+  description = "Firewall updated for Experiment 1."
 }
 
 resource "openstack_networking_secgroup_rule_v2" "ssh" {

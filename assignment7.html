@@ -1,0 +1,770 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Assignment 7 — Infrastructure as Code with OpenTofu</title>
+        <style>
+            :root {
+                --bg-color: #0f172a;
+                --card-bg: #1e293b;
+                --text-color: #f8fafc;
+                --text-muted: #94a3b8;
+                --accent-color: #38bdf8;
+                --accent-hover: #0284c7;
+                --border-color: #334155;
+                --code-bg: #090d16;
+                --success-color: #4ade80;
+                --warning-color: #facc15;
+            }
+
+            body {
+                font-family:
+                    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial,
+                    sans-serif;
+                background-color: var(--bg-color);
+                color: var(--text-color);
+                line-height: 1.6;
+                margin: 0;
+                padding: 0;
+            }
+
+            .container {
+                max-width: 1100px;
+                margin: 0 auto;
+                padding: 2rem 1rem;
+            }
+
+            header {
+                border-bottom: 1px solid var(--border-color);
+                padding-bottom: 1.5rem;
+                margin-bottom: 2rem;
+            }
+
+            h1 {
+                color: var(--accent-color);
+                font-size: 2.2rem;
+                margin-bottom: 0.5rem;
+            }
+
+            .meta-info {
+                color: var(--text-muted);
+                font-size: 0.95rem;
+            }
+
+            .meta-info a {
+                color: var(--accent-color);
+                text-decoration: none;
+            }
+
+            .meta-info a:hover {
+                text-decoration: underline;
+            }
+
+            section {
+                background: var(--card-bg);
+                border: 1px solid var(--border-color);
+                border-radius: 8px;
+                padding: 1.75rem;
+                margin-bottom: 2rem;
+            }
+
+            h2 {
+                color: var(--accent-color);
+                border-bottom: 1px solid var(--border-color);
+                padding-bottom: 0.5rem;
+                margin-top: 0;
+            }
+
+            h3 {
+                color: #e2e8f0;
+                margin-top: 1.5rem;
+            }
+
+            p,
+            li {
+                color: #cbd5e1;
+            }
+
+            code {
+                background: var(--code-bg);
+                color: #38bdf8;
+                padding: 0.2rem 0.4rem;
+                border-radius: 4px;
+                font-family: "Courier New", Courier, monospace;
+                font-size: 0.9rem;
+            }
+
+            pre {
+                background: var(--code-bg);
+                padding: 1rem;
+                border-radius: 6px;
+                overflow-x: auto;
+                border: 1px solid var(--border-color);
+            }
+
+            pre code {
+                padding: 0;
+                background: transparent;
+                color: #f1f5f9;
+            }
+
+            .img-container {
+                margin: 1.5rem 0;
+                text-align: center;
+            }
+
+            .img-container img {
+                max-width: 100%;
+                height: auto;
+                border-radius: 6px;
+                border: 1px solid var(--border-color);
+                box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+            }
+
+            .img-caption {
+                font-size: 0.85rem;
+                color: var(--text-muted);
+                margin-top: 0.5rem;
+                font-style: italic;
+            }
+
+            .badge {
+                display: inline-block;
+                padding: 0.25rem 0.5rem;
+                border-radius: 4px;
+                font-size: 0.8rem;
+                font-weight: bold;
+                text-transform: uppercase;
+                margin-right: 0.5rem;
+            }
+
+            .badge-prediction {
+                background: #3b82f6;
+                color: #fff;
+            }
+            .badge-result {
+                background: var(--success-color);
+                color: #0f172a;
+            }
+            .badge-explanation {
+                background: var(--warning-color);
+                color: #0f172a;
+            }
+
+            .experiment-box {
+                border-left: 4px solid var(--accent-color);
+                background: rgba(56, 189, 248, 0.05);
+                padding: 1rem 1.25rem;
+                margin: 1rem 0;
+                border-radius: 0 6px 6px 0;
+            }
+
+            footer {
+                text-align: center;
+                padding: 2rem 0;
+                color: var(--text-muted);
+                border-top: 1px solid var(--border-color);
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <header>
+                <h1>Weekly Assignment 7 — Infrastructure as Code</h1>
+                <div class="meta-info">
+                    <strong>Student:</strong>
+                    anasaemd |
+                    <strong>GitHub Repository:</strong>
+                    <a
+                        href="https://github.com/anasaemd25/cloud-services-assignment-7"
+                        target="_blank"
+                    >
+                        cloud-services-assignment-7
+                    </a>
+                    |
+                    <strong>Platform:</strong>
+                    CSC cPouta & OpenTofu
+                </div>
+            </header>
+
+            <!-- PART A: THEORY QUESTIONS -->
+            <section id="part-a">
+                <h2>Part A — Theoretical Questions</h2>
+
+                <h3>
+                    1. What is Infrastructure as Code (IaC), and which problems of manually created
+                    infrastructure does it solve?
+                </h3>
+                <p>
+                    <strong>Infrastructure as Code (IaC)</strong>
+                    means defining, creating, and managing cloud resources (like virtual machines,
+                    firewalls, and networks) using machine-readable configuration files instead of
+                    clicking buttons in a web console or running manual SSH terminal commands.
+                </p>
+                <p>
+                    <strong>Problems Solved (Compared to Week 1 Manual Setup):</strong>
+                </p>
+                <ul>
+                    <li>
+                        <strong>Human Error & Memory Loss:</strong>
+                        In Week 1, I built a server by hand clicking through CSC cPouta. If I needed
+                        to recreate that exact setup a month later, I might forget a specific
+                        firewall port or setting. IaC stores every setting in Git so it can be
+                        recreated perfectly every time.
+                    </li>
+                    <li>
+                        <strong>Speed & Automation:</strong>
+                        Creating a VM manually takes 10 to 15 minutes of clicking and SSH commands.
+                        With OpenTofu, running
+                        <code>tofu apply</code>
+                        builds the VM, key pairs, firewalls, public IP, and installs Apache
+                        automatically in under 30 seconds.
+                    </li>
+                    <li>
+                        <strong>Version Control:</strong>
+                        Because infrastructure is written in text files, changes can be tracked in
+                        Git, reviewed by teammates, and rolled back if something breaks.
+                    </li>
+                </ul>
+
+                <h3>2. Declarative vs. Imperative Automation & Idempotency</h3>
+                <p>
+                    <strong>Declarative Automation (OpenTofu / Terraform):</strong>
+                    You declare
+                    <em>what</em>
+                    the end state should look like (e.g., "I want 1 Linux VM with Port 80 open"),
+                    and the tool calculates the steps needed to reach that state. You don't write
+                    step-by-step instructions.
+                </p>
+                <p>
+                    <strong>Imperative Automation (Bash scripts / CLI):</strong>
+                    You list explicit step-by-step commands instructing the system
+                    <em>how</em>
+                    to build resources (e.g., "Step 1: Create network, Step 2: Attach IP, Step 3:
+                    Install Apache").
+                </p>
+                <p>
+                    <strong>Idempotency:</strong>
+                    Idempotency means that running the exact same code multiple times produces the
+                    exact same result without causing unintended side effects or duplicating
+                    resources. If I run
+                    <code>tofu apply</code>
+                    twice without changing my code, OpenTofu checks the cloud state, realizes
+                    everything already matches, and makes zero changes on the second run.
+                </p>
+
+                <h3>3. Why was OpenTofu created? Compare Terraform vs. OpenTofu</h3>
+                <p>
+                    <strong>Why OpenTofu was created:</strong>
+                    In August 2023, HashiCorp changed Terraform's open-source license from the
+                    open-source MPL license to a restrictive Business Source License (BUSL). In
+                    response, the open-source community and companies formed
+                    <strong>OpenTofu</strong>
+                    as a free, open-source fork under the Linux Foundation.
+                </p>
+                <p>
+                    <strong>Comparison for Developers and Companies:</strong>
+                </p>
+                <ul>
+                    <li>
+                        <strong>For Developers:</strong>
+                        There is almost no difference. OpenTofu uses the exact same HCL syntax,
+                        provider plugins, and configuration files (
+                        <code>.tf</code>
+                        ) as Terraform.
+                    </li>
+                    <li>
+                        <strong>For Companies:</strong>
+                        OpenTofu guarantees that the tooling remains 100% open-source without risk
+                        of licensing fees or vendor lock-in.
+                    </li>
+                </ul>
+
+                <h3>4. State File Purpose, Sensitivity, and Team Sharing</h3>
+                <p>
+                    <strong>
+                        Purpose of the State File (
+                        <code>terraform.tfstate</code>
+                        ):
+                    </strong>
+                    OpenTofu records a mapping between the resources defined in your code and the
+                    actual real-world IDs generated by CSC cPouta.
+                </p>
+                <p>
+                    <strong>Why it must NEVER be committed to Git:</strong>
+                    The state file stores raw infrastructure metadata and sensitive values (such as
+                    passwords, private keys, and internal IP addresses) in plain text.
+                </p>
+                <p>
+                    <strong>How Teams Share State:</strong>
+                    Teams store state files in encrypted remote backends (such as AWS S3 buckets or
+                    CSC Allas) with state-locking enabled so two engineers cannot modify the
+                    infrastructure simultaneously.
+                </p>
+            </section>
+
+            <!-- PART B: HANDS-ON -->
+            <section id="part-b">
+                <h2>Part B — Hands-On: Rebuild Your VM as Code</h2>
+
+                <p>
+                    In this hands-on exercise, I rebuilt the Week 1 web server entirely from code
+                    using OpenTofu on CSC cPouta.
+                </p>
+
+                <h3>Repository & Code Structure</h3>
+                <p>
+                    All infrastructure code is stored in my public GitHub repository:
+                    <a
+                        href="https://github.com/anasaemd25/cloud-services-assignment-7"
+                        target="_blank"
+                    >
+                        cloud-services-assignment-7
+                    </a>
+                </p>
+                <ul>
+                    <li>
+                        <code>main.tf</code>
+                        : Defines the core OpenStack infrastructure resources.
+                    </li>
+                    <li>
+                        <code>versions.tf</code>
+                        : Specifies the OpenStack provider version requirement.
+                    </li>
+                    <li>
+                        <code>variables.tf</code>
+                        : Declares input variables with default values, types, and descriptions.
+                    </li>
+                    <li>
+                        <code>outputs.tf</code>
+                        : Defines outputs that print the public IP address and website URL upon
+                        deployment.
+                    </li>
+                    <li>
+                        <code>cloud-init.yaml</code>
+                        : Defines post-boot instructions to update packages, install Apache, and
+                        write a custom
+                        <code>index.html</code>
+                        page showing my name.
+                    </li>
+                    <li>
+                        <code>.gitignore</code>
+                        : Protects sensitive files like state files (
+                        <code>*.tfstate</code>
+                        ) and OpenStack credential scripts (
+                        <code>*-openrc.sh</code>
+                        ) from being committed.
+                    </li>
+                </ul>
+
+                <h3>
+                    Breakdown of
+                    <code>main.tf</code>
+                    Resources
+                </h3>
+                <ul>
+                    <li>
+                        <code>data "openstack_networking_network_v2" "project"</code>
+                        : Looks up the existing CSC project network (
+                        <code>project_2020476</code>
+                        ).
+                    </li>
+                    <li>
+                        <code>resource "openstack_compute_keypair_v2" "web"</code>
+                        : Uploads my local public SSH key (
+                        <code>~/.ssh/id_rsa.pub</code>
+                        ) to cPouta.
+                    </li>
+                    <li>
+                        <code>resource "openstack_networking_secgroup_v2" "web"</code>
+                        : Creates a dedicated firewall security group.
+                    </li>
+                    <li>
+                        <code>resource "openstack_networking_secgroup_rule_v2" "ssh" & "http"</code>
+                        : Restricts SSH (port 22) access to my personal IP address and allows HTTP
+                        (port 80) traffic from anywhere.
+                    </li>
+                    <li>
+                        <code>resource "openstack_networking_port_v2" "web"</code>
+                        : Attaches a network port inside the project network protected by the
+                        security group.
+                    </li>
+                    <li>
+                        <code>resource "openstack_compute_instance_v2" "web"</code>
+                        : Provisions the Ubuntu 22.04 VM, attaches the key pair, and injects the
+                        <code>cloud-init.yaml</code>
+                        script.
+                    </li>
+                    <li>
+                        <code>resource "openstack_networking_floatingip_v2" "web"</code>
+                        : Allocates a public floating IP from the public pool and binds it to the
+                        VM's network port.
+                    </li>
+                </ul>
+
+                <h3>Initial Infrastructure Deployment</h3>
+                <p>
+                    After authenticating with
+                    <code>source project_2020476-openrc.sh</code>
+                    , I executed
+                    <code>tofu init</code>
+                    ,
+                    <code>tofu plan</code>
+                    , and
+                    <code>tofu apply</code>
+                    .
+                </p>
+
+                <div class="img-container">
+                    <img
+                        src="imgs-assigment7/1st-terminal.png"
+                        alt="OpenTofu Apply Initial Success"
+                    />
+                    <div class="img-caption">
+                        Figure 1: Initial tofu apply execution finished successfully, creating 7
+                        resources.
+                    </div>
+                </div>
+
+                <div class="img-container">
+                    <img src="imgs-assigment7/2nd-apache2.png" alt="Initial Apache Default Page" />
+                    <div class="img-caption">
+                        Figure 2: Default Apache landing page right after boot while cloud-init was
+                        processing in the background.
+                    </div>
+                </div>
+
+                <div class="img-container">
+                    <img
+                        src="imgs-assigment7/3rd-opentofu-site.png"
+                        alt="Custom Website with Student Name"
+                    />
+                    <div class="img-caption">
+                        Figure 3: Live web page serving "Hello, my name is anasaemd" after
+                        cloud-init completed.
+                    </div>
+                </div>
+
+                <div class="img-container">
+                    <img
+                        src="imgs-assigment7/4th-csc-pouta.png"
+                        alt="CSC cPouta Web Console View"
+                    />
+                    <div class="img-caption">
+                        Figure 4: CSC cPouta web console confirming the VM assignment7-vm in Active
+                        state with Floating IP 86.50.21.42.
+                    </div>
+                </div>
+            </section>
+
+            <!-- EXPERIMENTS SECTION -->
+            <section id="experiments">
+                <h2>OpenTofu Experiments</h2>
+
+                <!-- EXPERIMENT 1 -->
+                <h3>✏ Experiment 1: Code Modifications (In-Place vs. Replacement)</h3>
+                <div class="experiment-box">
+                    <p><span class="badge badge-prediction">Prediction</span></p>
+                    <p>I modified two parts of the code:</p>
+                    <ol>
+                        <li>
+                            Updated the security group description in
+                            <code>main.tf</code>
+                            .
+                            <strong>Prediction:</strong>
+                            Updated in-place (no VM recreation needed because OpenStack allows
+                            metadata updates directly).
+                        </li>
+                        <li>
+                            Updated the
+                            <code>page_message</code>
+                            variable in
+                            <code>variables.tf</code>
+                            .
+                            <strong>Prediction:</strong>
+                            Requires VM replacement (destruction and recreation) because
+                            <code>user_data</code>
+                            /
+                            <code>cloud-init</code>
+                            scripts are executed only once during the initial instance boot phase.
+                        </li>
+                    </ol>
+                </div>
+
+                <div class="img-container">
+                    <img
+                        src="imgs-assigment7/6th-terminal-after-updating-experiment.png"
+                        alt="Experiment 1 Terminal Plan and Apply"
+                    />
+                    <div class="img-caption">
+                        Figure 5: Terminal showing OpenTofu updating the security group in-place (~)
+                        while replacing (-/+) the VM instance due to user_data changes.
+                    </div>
+                </div>
+
+                <div class="img-container">
+                    <img
+                        src="imgs-assigment7/5th-site-updated-after-experiment.png"
+                        alt="Experiment 1 Browser Output"
+                    />
+                    <div class="img-caption">
+                        Figure 6: Replaced VM serving the updated text: "This is the updated version
+                        trough Experiment 1."
+                    </div>
+                </div>
+
+                <div class="experiment-box">
+                    <p><span class="badge badge-explanation">Explanation</span></p>
+                    <p>
+                        OpenTofu distinguishes between mutable parameters (like firewall
+                        descriptions) that can be changed via API calls without interrupting running
+                        services, and immutable parameters (like
+                        <code>user_data</code>
+                        initialization scripts) that cannot be altered after a virtual machine has
+                        been provisioned. To apply the new
+                        <code>user_data</code>
+                        , OpenTofu destroyed the existing instance and created a new one.
+                    </p>
+                </div>
+
+                <!-- EXPERIMENT 2 -->
+                <h3>🌀 Experiment 2: Configuration Drift</h3>
+                <div class="experiment-box">
+                    <p><span class="badge badge-prediction">Prediction</span></p>
+                    <p>
+                        I manually modified the security group description in the CSC cPouta web
+                        console to
+                        <code>"Updated manually from the web console."</code>
+                        .
+                        <strong>Prediction:</strong>
+                        Running
+                        <code>tofu plan</code>
+                        will detect this manual change (configuration drift) by comparing real-world
+                        infrastructure against the local state file and will propose updating the
+                        firewall back to match the code in
+                        <code>main.tf</code>
+                        .
+                    </p>
+                </div>
+
+                <div class="img-container">
+                    <img
+                        src="imgs-assigment7/7th-Updated manually from the web console.png"
+                        alt="Manual Modification in cPouta Console"
+                    />
+                    <div class="img-caption">
+                        Figure 7: CSC cPouta web console showing the security group description
+                        edited manually.
+                    </div>
+                </div>
+
+                <div class="img-container">
+                    <img
+                        src="imgs-assigment7/8th-drift-console-after-web-updated.png"
+                        alt="Drift Detections in tofu plan"
+                    />
+                    <div class="img-caption">
+                        Figure 8: OpenTofu detecting the drift during plan and proposing an in-place
+                        update back to the declared configuration.
+                    </div>
+                </div>
+
+                <div class="img-container">
+                    <img
+                        src="imgs-assigment7/9th-toffu-apply.png"
+                        alt="Drift Corrected via tofu apply"
+                    />
+                    <div class="img-caption">
+                        Figure 9: Executing tofu apply to revert manual drift and restore
+                        infrastructure state.
+                    </div>
+                </div>
+
+                <div class="experiment-box">
+                    <p><span class="badge badge-explanation">Explanation</span></p>
+                    <p>
+                        When
+                        <code>tofu plan</code>
+                        runs, OpenTofu queries the OpenStack API to refresh the actual live state of
+                        the cloud resources and compares it against the declared state in
+                        <code>main.tf</code>
+                        . Because the code is the single source of truth, OpenTofu detected that the
+                        live security group description differed from the code and generated an
+                        execution plan to overwrite the manual console change, returning the
+                        firewall back to code specification.
+                    </p>
+                </div>
+
+                <!-- EXPERIMENT 3 -->
+                <h3>🔁 Experiment 3: Destroy and Rebuild</h3>
+                <div class="experiment-box">
+                    <p><span class="badge badge-prediction">Prediction</span></p>
+                    <p>
+                        <strong>Destruction Prediction:</strong>
+                        Running
+                        <code>tofu destroy</code>
+                        will dismantle resources in reverse order of their dependency graph (VM
+                        instance and Floating IP first, followed by network port, firewall rules,
+                        security group, and SSH key pair).
+                        <br />
+                        <strong>Rebuild Prediction:</strong>
+                        Running
+                        <code>tofu apply</code>
+                        again will rebuild the entire working web server environment from scratch
+                        automatically without any manual intervention.
+                    </p>
+                </div>
+
+                <div class="img-container">
+                    <img
+                        src="imgs-assigment7/10th-tofu-destroy-prompt.png"
+                        alt="tofu destroy Prompt"
+                    />
+                    <div class="img-caption">
+                        Figure 10: Destruction confirmation prompt listing all 7 resources scheduled
+                        for removal.
+                    </div>
+                </div>
+
+                <div class="img-container">
+                    <img
+                        src="imgs-assigment7/11th-tofu-destroy-complete.png"
+                        alt="tofu destroy Completion"
+                    />
+                    <div class="img-caption">
+                        Figure 11: Terminal output confirming all 7 resources destroyed
+                        successfully.
+                    </div>
+                </div>
+
+                <div class="img-container">
+                    <img
+                        src="imgs-assigment7/12th-csc-pouta-empty-instances.png"
+                        alt="CSC cPouta Empty Instances View"
+                    />
+                    <div class="img-caption">
+                        Figure 12: CSC cPouta console showing zero instances running after
+                        destruction.
+                    </div>
+                </div>
+
+                <div class="img-container">
+                    <img
+                        src="imgs-assigment7/13th-tofu-apply-rebuild-terminal.png"
+                        alt="Rebuild tofu apply Terminal Output"
+                    />
+                    <div class="img-caption">
+                        Figure 13: Executing tofu apply to rebuild the entire environment from
+                        scratch.
+                    </div>
+                </div>
+
+                <div class="img-container">
+                    <img
+                        src="imgs-assigment7/14th-rebuilt-site-browser.png"
+                        alt="Rebuilt Website Live in Browser"
+                    />
+                    <div class="img-caption">
+                        Figure 14: Fully rebuilt web server running on new Floating IP (86.50.22.18)
+                        serving the website automatically.
+                    </div>
+                </div>
+
+                <div class="img-container">
+                    <img
+                        src="imgs-assigment7/15th-csc-pouta-rebuilt-instance.png"
+                        alt="Rebuilt VM Active in cPouta"
+                    />
+                    <div class="img-caption">
+                        Figure 15: CSC cPouta console showing the newly provisioned assignment7-vm
+                        in Active state.
+                    </div>
+                </div>
+
+                <div class="experiment-box">
+                    <p><span class="badge badge-explanation">Explanation</span></p>
+                    <p>
+                        OpenTofu manages resources using a directed acyclic graph (DAG) of
+                        dependencies. During
+                        <code>tofu destroy</code>
+                        , dependent resources (like instances and floating IPs attached to network
+                        ports) are deleted before the underlying network ports or security groups
+                        can be safely removed. Upon running
+                        <code>tofu apply</code>
+                        , OpenTofu recreated the exact environment from code, demonstrating complete
+                        infrastructure repeatability.
+                    </p>
+                </div>
+            </section>
+
+            <!-- REFLECTION & TROUBLESHOOTING -->
+            <section id="reflection">
+                <h2>Reflection & Comparison</h2>
+                <p>Comparing manual VM setup (Week 1) with Infrastructure as Code (Week 7):</p>
+                <ul>
+                    <li>
+                        <strong>Effort & Speed:</strong>
+                        In Week 1, manually creating the VM, setting up security rules, assigning
+                        IPs, logging in over SSH, and configuring Apache required over 15 minutes of
+                        manual labor. In Week 7, writing the code took initial thought, but
+                        deploying and rebuilding the entire setup took less than 30 seconds with a
+                        single command.
+                    </li>
+                    <li>
+                        <strong>Repeatability & Reliability:</strong>
+                        Manual setups are hard to document perfectly and vulnerable to human error.
+                        IaC allows identical infrastructure environments to be created reliably
+                        across testing, staging, and production.
+                    </li>
+                    <li>
+                        <strong>Security:</strong>
+                        Manual setups often lead to open firewall rules or misplaced SSH keys. IaC
+                        keeps security group rules strictly defined in code, validated, and
+                        version-controlled.
+                    </li>
+                    <li>
+                        <strong>When to use each:</strong>
+                        Manual setups are suitable for quick one-off testing or learning. IaC is
+                        essential for production cloud engineering, team collaboration, and scalable
+                        software systems.
+                    </li>
+                </ul>
+
+                <h2>Troubleshooting Log</h2>
+                <p>
+                    <strong>Problem 1: Missing SSH Key Pair</strong>
+                    <br />
+                    <em>Symptom:</em>
+                    <code>tofu plan</code>
+                    failed with error
+                    <code>no file exists at "/home/anas/.ssh/id_rsa.pub"</code>
+                    .
+                    <br />
+                    <em>Solution:</em>
+                    Generated a standard RSA SSH key pair locally using
+                    <code>ssh-keygen -t rsa -b 4096 -f ~/.ssh/id_rsa</code>
+                    .
+                </p>
+                <p>
+                    <strong>Problem 2: OpenStack Authentication Session Expiration</strong>
+                    <br />
+                    <em>Symptom:</em>
+                    OpenTofu commands returned
+                    <code>Error creating OpenStack networking client: Authentication failed</code>
+                    .
+                    <br />
+                    <em>Solution:</em>
+                    Re-loaded the OpenStack environment variables into the active terminal session
+                    using
+                    <code>source project_2020476-openrc.sh</code>
+                    and entered the cPouta account password.
+                </p>
+            </section>
+
+            <footer>
+                <p>Cloud Services Course 2026 | Assignment 7 Documentation | Hosted on CSC Rahti</p>
+            </footer>
+        </div>
+    </body>
+</html>

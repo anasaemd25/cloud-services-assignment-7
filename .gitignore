@@ -2,3 +2,6 @@
 *.tfstate.*
 *.tfvars
 *-openrc.sh
+*.terraform
+*.terraform*
+.terraform/

@@ -36,5 +36,5 @@ variable "student_name" {
 variable "page_message" {
   description = "Message for the web page"
   type        = string
-  default     = "This server was built entirely from code using OpenTofu."
+  default     = "This is the updated version trough Experiment 1."
 }
