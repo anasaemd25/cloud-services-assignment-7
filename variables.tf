@@ -16,7 +16,12 @@ variable "ssh_public_key_path" {
 variable "ssh_allowed_cidr" {
   description = "Your personal IP address to allow SSH access"
   type        = string
-  default     = "123.45.67.89/32" # Google "what is my IP", paste it here, and leave the /32 at the end.
+  default     = "123.45.67.89/32" 
+
+  validation {
+    condition     = can(cidrhost(var.ssh_allowed_cidr, 0))
+    error_message = "ssh_allowed_cidr must be in CIDR format, e.g. 123.45.67.89/32."
+  }
 }
 variable "image_name" {
   description = "Linux image to use"
